@@ -17,6 +17,15 @@ const studentQuestions = [
 "What is your mobile number?"
 ];
 
+const teacherQuestions = [
+  "What is your name?",
+  "What is your age?",
+  "What subject do you teach?",
+  "Which grade levels do you teach?",
+  "What is your e-mail address?",
+  "What is your mobile number?"
+];
+
 
 // Fetch syllabus details using OpenAI
 const fetchSyllabus = async (classStandard, board, stream) => {
