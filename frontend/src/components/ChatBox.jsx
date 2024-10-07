@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from './axiosConfig.js';
 import ReactMarkdown from 'react-markdown';
-import MermaidRenderer from './MermaidRenderer.jsx';
 import './style.css';
 
 const ChatBox = ({ role }) => {
@@ -34,22 +33,29 @@ const ChatBox = ({ role }) => {
     try {
       let response;
       if (isCollectionComplete) {
-        if (message.toLowerCase().includes('explain')) {
-          const topic = message.replace('explain', '').trim();
-          response = await axios.post('/api/explain', { topic });
-          const { explanation, diagram } = response.data;
+        response = await axios.post('/api/chat/furtherRequest', { message, role });
+        setChatHistory((prevHistory) => [
+          ...prevHistory,
+          { type: 'bot', text: response.data.reply }
+        ]);
+      } else {
+        const questionField = role === 'student'
+          ? ['name', 'age', 'class', 'stream', 'school', 'board', 'email', 'mobile'][currentStep - 1]
+          : ['name', 'age', 'subject', 'grade_levels', 'email', 'mobile'][currentStep - 1];
 
-          setChatHistory((prevHistory) => [
-            ...prevHistory,
-            { type: 'bot', text: explanation },
-            { type: 'mermaid', chart: diagram }
-          ]);
-        } else {
-          response = await axios.post('/api/chat/furtherRequest', { message, role });
-          setChatHistory((prevHistory) => [
-            ...prevHistory,
-            { type: 'bot', text: response.data.reply }
-          ]);
+        const updatedUser = { ...user, [questionField]: message };
+        response = await axios.post('/api/chat/saveResponse', { user: updatedUser, role, step: currentStep });
+
+        setChatHistory((prevHistory) => [
+          ...prevHistory,
+          { type: 'bot', text: response.data.nextQuestion || response.data.reply || 'We have collected your information. How can I help you further?' }
+        ]);
+
+        setUser(updatedUser);
+        setCurrentStep(response.data.nextStep || currentStep + 1);
+
+        if (response.data.complete) {
+          setIsCollectionComplete(true);
         }
       }
     } catch (error) {
@@ -92,11 +98,7 @@ const ChatBox = ({ role }) => {
       <div ref={chatHistoryRef} className="chat-history">
         {chatHistory.map((chat, index) => (
           <div key={index} className={`chat-message ${chat.type}`}>
-            {chat.type === 'mermaid' ? (
-              <MermaidRenderer chart={chat.chart} />
-            ) : (
-              <ReactMarkdown>{chat.text}</ReactMarkdown>
-            )}
+            <ReactMarkdown>{chat.text}</ReactMarkdown>
           </div>
         ))}
       </div>
