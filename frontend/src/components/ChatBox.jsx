@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from './axiosConfig.js';
 import ReactMarkdown from 'react-markdown';
-import MermaidRenderer from './MermaidRenderer';
+import MermaidRenderer from './MermaidRenderer.jsx';
 import './style.css';
 
 const ChatBox = ({ role }) => {
