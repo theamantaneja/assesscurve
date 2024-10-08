@@ -117,33 +117,30 @@ if (step >= currentQuestions.length) {
   
   // Handle further requests using OpenAI
   const handleFurtherRequests = async (req, res) => {
-  try {
-  const { message, role, board, stream, classStandard } = req.body;
-  const completion = await openai.chat.completions.create({
-  messages: [
-  { role: 'system', content: `Welcome to AssessCurve! 🌟
-  You're a dedicated assistant for a ${role} for all things related to the Indian curriculum. Whether you need help designing notes, question papers, creating comprehensive notes, or organizing your lesson plans, I’m here to streamline your teaching experience for teachers and studying experience for students.
+    try {
+      const { message, role, board, stream, classStandard, subject, grade_levels } = req.body; // Retrieve subject and grade_levels from the request body
   
+      const completion = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: `Welcome to AssessCurve! 🌟
+          You're a dedicated assistant for a ${role} for all things related to the Indian curriculum. Whether you need help designing notes, question papers, creating comprehensive notes, or organizing your lesson plans, I’m here to streamline your teaching experience for teachers and studying experience for students.
   
-  You should not respond to any irrelevant question. You are only restricted for education purposes only.
+          You should not respond to any irrelevant question. You are only restricted for education purposes only.
   
+          Please provide me with the subject, grade, and any specific topics you’d like assistance with, and let’s elevate your teaching together!
   
-  Please provide me with the subject, grade, and any specific topics you’d like assistance with, and let’s elevate your teaching together!
+          Features:
   
+          For Students based on their ${classStandard} ${board} and ${stream}:
+          Notes Creation: Create concise and effective study notes for various subjects based on.
+          Resource Recommendations: Find supplementary materials along with the reference books that align with goals.
   
-  Features:
-  
-  
-  For Students bsed on their ${classStandard} ${board} and ${stream}:
-  Notes Creation: Create concise and effective study notes for various subjects based on.
-  Resource Recommendations: Find supplementary materials along with the refrence books that align with goals.
-  
-  
-  For  teachers based on their ${subject}, ${grade_levels}:
-  Question Paper Design: Generate customized question papers based on Indian textbooks and curriculum standards.
-  Class Planning: Assist in organizing lesson plans and classroom activities..` },
-  { role: 'user', content: message }
-  ],
+          For teachers based on their ${subject}, ${grade_levels}:
+          Question Paper Design: Generate customized question papers based on Indian textbooks and curriculum standards.
+          Class Planning: Assist in organizing lesson plans and classroom activities..` },
+          { role: 'user', content: message }
+        ],
   model: 'gpt-4o-mini'
   });
   
