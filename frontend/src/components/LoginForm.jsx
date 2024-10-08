@@ -39,10 +39,14 @@ const CloseButton = styled.span`
 `;
 
 const Heading = styled.h2`
-  color: #da4ea2;
-  margin-bottom: 30px;
-  text-align: center;
+  color: #da4ea2;         /* Match the theme color */
+  text-align: center;      /* Center the heading */
+  margin-bottom: 30px;     /* Add some spacing below the heading */
+  font-size: 36px;         /* Optional: Control font size */
+  font-weight: bold; 
 `;
+
+
 
 const Input = styled.input`
   margin-bottom: 20px;

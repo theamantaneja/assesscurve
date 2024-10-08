@@ -41,7 +41,7 @@ const H2 = styled.h2`
   color: #da4ea2;         /* Match the theme color */
   text-align: center;      /* Center the heading */
   margin-bottom: 30px;     /* Add some spacing below the heading */
-  font-size: 24px;         /* Optional: Control font size */
+  font-size: 36px;         /* Optional: Control font size */
   font-weight: bold;       /* Optional: Make the heading bold */
 `;
 
