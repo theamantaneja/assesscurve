@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import styled from "styled-components";
+import { UserContext } from "../context/UserContext";  // Using UserContext
 
 const Modal = styled.div`
   position: fixed;
@@ -38,11 +39,11 @@ const CloseButton = styled.span`
 `;
 
 const H2 = styled.h2`
-  color: #da4ea2;         /* Match the theme color */
-  text-align: center;      /* Center the heading */
-  margin-bottom: 30px;     /* Add some spacing below the heading */
-  font-size: 36px;         /* Optional: Control font size */
-  font-weight: bold;       /* Optional: Make the heading bold */
+  color: #da4ea2;
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 36px;
+  font-weight: bold;
 `;
 
 const FormRow = styled.div`
@@ -50,9 +51,9 @@ const FormRow = styled.div`
   justify-content: space-between;
   gap: 15px;
   margin-bottom: 15px;
-  
+
   @media (max-width: 768px) {
-    flex-direction: column;  // For mobile, stack fields vertically
+    flex-direction: column;  
     gap: 0;
   }
 `;
@@ -124,6 +125,8 @@ const SignUpForm = ({ onSwitchToLogin, onClose }) => {
   const [subject, setSubject] = useState("");
   const [gradeLevels, setGradeLevels] = useState("");
 
+  const { login } = useContext(UserContext);  // Use UserContext for login functionality
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -160,9 +163,14 @@ const SignUpForm = ({ onSwitchToLogin, onClose }) => {
       const data = await response.json();
       if (response.ok) {
         console.log("User registered successfully:", data);
-        onSwitchToLogin(); // Go to login after successful registration
+
+        // Automatically log in the user after sign-up (optional)
+        login(data.token, data.user.role, data.user.id);  // Save token, role, and userId to UserContext
+        
+        onClose(); // Close modal after successful sign-up  
       } else {
         console.error("Error during registration:", data);
+        alert(data.error || 'Registration failed.');
       }
     } catch (error) {
       console.error("Error:", error);
@@ -171,7 +179,7 @@ const SignUpForm = ({ onSwitchToLogin, onClose }) => {
 
   const handleClickOutside = (e) => {
     if (e.target.id === "modal") {
-      onClose(); // Close modal
+      onClose(); // Close modal if clicked outside
     }
   };
 
@@ -262,7 +270,6 @@ const SignUpForm = ({ onSwitchToLogin, onClose }) => {
 
                 <Select value={stream} onChange={(e) => setStream(e.target.value)} required>
                   <option value="" disabled>Select Stream</option>
-                  <option value="general">General</option>
                   <option value="PCM">PCM</option>
                   <option value="PCMB">PCMB</option>
                   <option value="PCB">PCB</option>

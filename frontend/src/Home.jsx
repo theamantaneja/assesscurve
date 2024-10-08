@@ -7,6 +7,7 @@ import Contact from './components/Contact';
 import LoginForm from './components/LoginForm';
 import SignUpForm from './components/SignUpForm';
 import RoleSelection from './components/RoleSelection';
+import { UserContext } from '../context/UserContext';  // Import the UserContext to access logged-in state
 
 const Container = styled.div`
   height: 100vh;
@@ -33,40 +34,43 @@ const Section = styled.div`
 `;
 
 function Home() {
-  const [showLogin, setShowLogin] = useState(false);  // Hide login form by default
-  const [showSignUp, setShowSignUp] = useState(false);
-  
+  const [showLogin, setShowLogin] = useState(false);  // Manage login modal state
+  const [showSignUp, setShowSignUp] = useState(false);  // Manage sign-up modal state
+
+  // Access logged-in state from UserContext (optional, if you want to conditionally render content based on logged-in state)
+  const { isLoggedIn, role } = React.useContext(UserContext);
+
   useEffect(() => {
     console.log('Login Modal State:', showLogin);
     console.log('SignUp Modal State:', showSignUp);
-  }, [showLogin, showSignUp]);
+  }, [showLogin, showSignUp]);  // Log modal state changes to debug modal visibility
 
-  // Close both modals
+  // Function to close both modals
   const handleCloseModal = useCallback(() => {
     console.log('Closing all modals');
     setShowLogin(false);
     setShowSignUp(false);
   }, []);
 
-  // Open Login modal
+  // Function to open the Login modal
   const handleOpenLogin = useCallback(() => {
     console.log('Opening login modal');
     setShowLogin(true);
-    setShowSignUp(false);  // Ensure SignUp is hidden
+    setShowSignUp(false);  // Hide Sign-Up modal when login is open
   }, []);
 
-  // Open Sign-Up modal
+  // Function to open the Sign-Up modal
   const handleOpenSignUp = useCallback(() => {
     console.log('Opening sign-up modal');
     setShowSignUp(true);
-    setShowLogin(false);  // Ensure Login is hidden
+    setShowLogin(false);  // Hide Login modal when sign-up is open
   }, []);
 
   return (
     <Container>
-      {/* Conditionally render the LoginForm and SignUpForm based on state */}
+      {/* Conditionally render the LoginForm and SignUpForm based on modal state */}
       {showLogin && <LoginForm onClose={handleCloseModal} onSwitchToSignUp={handleOpenSignUp} />}
-      {showSignUp && <SignUpForm onClose={handleCloseModal} />}
+      {showSignUp && <SignUpForm onClose={handleCloseModal} onSwitchToLogin={handleOpenLogin} />}
 
       {/* Website sections */}
       <Section><Hero /></Section>
@@ -74,11 +78,11 @@ function Home() {
       <Section><Works /></Section>
       <Section><Contact /></Section>
 
-      {/* RoleSelection component controlling modal state */}
+      {/* RoleSelection controls which modal (login or sign-up) to open */}
       <Section>
         <RoleSelection
-          onLoginClick={handleOpenLogin}   // Trigger login modal open
-          onSignUpClick={handleOpenSignUp} // Trigger sign-up modal open
+          onLoginClick={handleOpenLogin}    // Open login modal when "Login" button is clicked
+          onSignUpClick={handleOpenSignUp}  // Open sign-up modal when "Sign Up" button is clicked
         />
       </Section>
     </Container>

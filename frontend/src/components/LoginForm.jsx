@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import styled from 'styled-components';
-import { UserContext } from '../context/UserContext';
+import { UserContext } from '../context/UserContext';  // Using UserContext
 
 const Modal = styled.div`
   position: fixed;
@@ -39,14 +39,12 @@ const CloseButton = styled.span`
 `;
 
 const Heading = styled.h2`
-  color: #da4ea2;         /* Match the theme color */
-  text-align: center;      /* Center the heading */
-  margin-bottom: 30px;     /* Add some spacing below the heading */
-  font-size: 36px;         /* Optional: Control font size */
-  font-weight: bold; 
+  color: #da4ea2;
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 36px;
+  font-weight: bold;
 `;
-
-
 
 const Input = styled.input`
   margin-bottom: 20px;
@@ -128,11 +126,11 @@ const LoginForm = ({ onClose, onSwitchToSignUp }) => {
       if (response.ok) {
         console.log('Login successful, token generated:', data.token);
         console.log('User data received:', data.user);
-        login(data.token, data.user.role, data.user.id);
+        login(data.token, data.user.role, data.user.id);  // Store login data in UserContext
         onClose();  // Close the modal after successful login
       } else {
         console.error('Error during login:', data.error);
-        alert(data.error);  // Show error message
+        alert(data.error);  // Show error message if login fails
       }
     } catch (error) {
       console.error('Error occurred during login:', error);
