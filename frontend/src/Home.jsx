@@ -33,50 +33,49 @@ const Section = styled.div`
 `;
 
 function Home() {
-  const [showLogin, setShowLogin] = useState(true);  // Initially show login modal
+  const [showLogin, setShowLogin] = useState(false);  // Set login window to hidden by default
   const [showSignUp, setShowSignUp] = useState(false);
   
-  // Log the states whenever modals are opened or closed
+  // Logging whenever modal visibility changes for debugging purpose
   useEffect(() => {
     console.log('showLogin:', showLogin);
     console.log('showSignUp:', showSignUp);
   }, [showLogin, showSignUp]);
 
-  // Close both modals and log it
+  // Function to close both modals
   const handleCloseModal = useCallback(() => {
     console.log('Closing any open modal');
     setShowLogin(false);
     setShowSignUp(false);
-  }, []);  // Stable function
+  }, []);
 
-  // Open login modal and log it
+  // Function to open the login modal
   const handleOpenLogin = useCallback(() => {
     console.log('Opening login modal');
     setShowLogin(true);
     setShowSignUp(false);
-  }, []);  // Stable function
+  }, []);
 
-  // Open sign-up modal and log it
+  // Function to open the sign-up modal
   const handleOpenSignUp = useCallback(() => {
     console.log('Opening sign-up modal');
     setShowSignUp(true);
     setShowLogin(false);
-  }, []);  // Stable function
+  }, []);
 
-  // Verbose console log to track modal states updates
   return (
     <Container>
-      {/* Conditionally render Login or SignUp modals */}
+      {/* Conditionally render Login or SignUp modals when the respective state is true */}
       {showLogin && <LoginForm onClose={handleCloseModal} />}
       {showSignUp && <SignUpForm onClose={handleCloseModal} />}
 
-      {/* Main website components */}
+      {/* Main website sections */}
       <Section><Hero /></Section>
       <Section><Who /></Section>
       <Section><Works /></Section>
       <Section><Contact /></Section>
 
-      {/* Pass down the modal openers to RoleSelection */}
+      {/* Pass modal open handlers to RoleSelection */}
       <Section>
         <RoleSelection
           onLoginClick={handleOpenLogin}   // Pass login click handler

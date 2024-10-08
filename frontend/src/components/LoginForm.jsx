@@ -68,7 +68,24 @@ const Button = styled.button`
   }
 `;
 
-const LoginForm = ({ onClose }) => {
+const SwitchToSignUp = styled.p`
+  color: white;
+  margin-top: 10px;
+  text-align: center;
+  font-size: 14px;
+  
+  a {
+    color: #da4ea2;
+    cursor: pointer;
+    font-weight: bold;
+
+    &:hover {
+      color: #b83c8f;
+    }
+  }
+`;
+
+const LoginForm = ({ onClose, onSwitchToSignUp }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('student');  // Assume a default role, can be 'student' or 'teacher'
@@ -85,7 +102,7 @@ const LoginForm = ({ onClose }) => {
     };
   
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      const response = await fetch('https://assesscurve.onrender.com/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -150,6 +167,11 @@ const LoginForm = ({ onClose }) => {
           </select>
           <Button type="submit">Login</Button>
         </form>
+
+        {/* "Don't have an account? Sign up" section */}
+        <SwitchToSignUp>
+          Don't have an account? <a onClick={onSwitchToSignUp}>Sign Up</a>
+        </SwitchToSignUp>
       </FormContainer>
     </Modal>
   );
