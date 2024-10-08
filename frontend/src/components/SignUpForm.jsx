@@ -37,6 +37,14 @@ const CloseButton = styled.span`
   }
 `;
 
+const H2 = styled.h2`
+  color: #da4ea2;         /* Match the theme color */
+  text-align: center;      /* Center the heading */
+  margin-bottom: 30px;     /* Add some spacing below the heading */
+  font-size: 24px;         /* Optional: Control font size */
+  font-weight: bold;       /* Optional: Make the heading bold */
+`;
+
 const FormRow = styled.div`
   display: flex;
   justify-content: space-between;
@@ -170,7 +178,7 @@ const SignUpForm = ({ onSwitchToLogin, onClose }) => {
     <Modal id="modal" onClick={handleClickOutside}>
       <FormContainer>
         <CloseButton onClick={onClose}>&times;</CloseButton>
-        <h2 style={{ color: "#da4ea2" }}>Sign Up</h2>
+        <H2>Sign Up</H2>
         <form onSubmit={handleSubmit}>
           <FormRow>
             <Select value={role} onChange={(e) => setRole(e.target.value)} required>
