@@ -35,7 +35,7 @@
 }
 
 .chat-footer {
-  padding: 80px;
+  padding: 20px;
   display: flex;
   align-items: center; /* Align items vertically */
   justify-content: space-between;

@@ -4,132 +4,111 @@ const Teacher = require('../models/Teacher');
 const config = require('../config/config');
 const openai = new OpenAI({ apiKey: config.openAIAPIKey });
 
-// Questions for data collection
-const studentQuestions = [
-  "What is your class/standard?",
-  "What is your stream if you are in 11 or 12? Enter 'general' if not applicable.",
-  "What is the board of your school?",
-];
-
-const teacherQuestions = [
-  "What subject do you teach?",
-  "Which grade levels do you teach?",
-];
-
-// Fetch syllabus details using OpenAI
-const fetchSyllabus = async (classStandard, board, stream) => {
-  const completion = await openai.chat.completions.create({
-    model: 'gpt-4o-mini',
-    messages: [
-      { role: 'system', content: 'You are an educational assistant providing syllabus details.' },
-      { role: 'user', content: `Provide the syllabus and key topics covered for class/standard ${classStandard} with stream ${stream} under the ${board} board.` }
-    ]
-  });
-
-  return completion.choices[0]?.message?.content.trim() || 'No syllabus available.';
-};
-
-// Store responses and manage questions
-const storeUserResponse = async (req, res) => {
+// Fetch syllabus for students based on class, board, and stream
+const getSyllabusForStudent = async (classStandard, board, stream) => {
   try {
-    const { user, role, step } = req.body;
-    const currentQuestions = role === 'student' ? studentQuestions : teacherQuestions;
-
-    console.log('Received user data:', user);
-
-    if (step >= currentQuestions.length) {
-      if (role === 'student') {
-        const { class: classStandard, stream, board } = user;
-
-        const studentData = {
-          name: user.name || 'Anonymous', // Default name
-          age: user.age || null, // Default age
-          class: classStandard,
-          stream: stream || 'general',
-          school: user.school || 'Unknown School', // Default school
-          board,
-          email: user.email || 'noemail@example.com', // Default email
-          mobile: user.mobile || '0000000000' // Default mobile
-        };
-
-        console.log('Saving student data:', studentData);
-
-        const student = new Student(studentData);
-        const savedStudent = await student.save();
-        const syllabus = await fetchSyllabus(classStandard, board, stream);
-
-        res.status(200).json({
-          reply: `We have collected your information. Based on your class/standard (${classStandard}) and board (${board}), here is your syllabus: ${syllabus}. How can I help you further?`,
-          nextStep: null,
-          complete: true,
-        });
-      } else if (role === 'teacher') {
-        const { subject, grade_levels } = user;
-
-        const teacherData = {
-          name: user.name || 'Anonymous', // Default name
-          age: user.age || null, // Default age
-          subject,
-          grade_levels,
-          email: user.email || 'noemail@example.com', // Default email
-          mobile: user.mobile || '0000000000' // Default mobile
-        };
-
-        const teacher = new Teacher(teacherData);
-        const savedTeacher = await teacher.save();
-
-        res.status(200).json({
-          reply: "We have collected your information. How can I help you further?",
-          nextStep: null,
-          complete: true,
-        });
-      }
-    } else {
-      res.status(200).json({
-        message: 'Partial response stored',
-        user,
-        nextStep: step + 1,
-        nextQuestion: currentQuestions[step],
-      });
-    }
-  } catch (error) {
-    console.error('Error in storeUserResponse:', error);
-    if (error.code === 11000) {
-      res.status(400).json({ error: 'Duplicate email detected. Please use a different email address.' });
-    } else {
-      res.status(500).json({ error: 'An error occurred while saving the response.' });
-    }
-  }
-};
-
-// Handle further requests using OpenAI
-const handleFurtherRequests = async (req, res) => {
-  try {
-    const { message, role, classStandard, board, stream, subject, grade_levels } = req.body;
-
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: 'gpt-4',
       messages: [
-        { 
-          role: 'system', 
-          content: `Welcome to AssessCurve! 🌟
-          You're a dedicated assistant for a ${role} handling inquiries related to the Indian curriculum. 
-
-          Based on the provided details, you can help students and teachers with premium educational assistance.
-
-          For students in ${classStandard} ${board} ${stream}, I can create notes, provide resources, etc.
-          For teachers teaching ${subject} to ${grade_levels}, I can assist in lesson planning and question paper design.` 
-        },
-        { role: 'user', content: message }
+        { role: 'system', content: 'You are an educational assistant providing syllabus details for students based on the Indian education system.' },
+        { role: 'user', content: `Provide the syllabus for Class ${classStandard} under the ${board} board, stream ${stream}.` }
       ]
     });
-    
-    res.status(200).json({ reply: completion.choices[0]?.message?.content.trim() || 'Sorry, I cannot assist with that request.' });
 
+    return completion.choices[0]?.message?.content.trim() || 'No specific syllabus information found for the provided details.';
   } catch (error) {
-    console.error('Error generating OpenAI response:', error);
-    res.status(500).json({ error: 'An error occurred while generating the response.' });
+    console.error('Error fetching student syllabus from OpenAI:', error);
+    throw new Error('Failed to retrieve syllabus from OpenAI.');
   }
 };
 
-module.exports = { storeUserResponse, handleFurtherRequests };
+// Fetch lesson planning details for teachers using OpenAI
+const getLessonPlanForTeacher = async (subject, grade_levels) => {
+  try {
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4',
+      messages: [
+        { role: 'system', content: 'You are an educational assistant for teachers in India, helping create lesson plans.' },
+        { role: 'user', content: `Provide lesson planning topics for the subject ${subject} for grades ${grade_levels}.` }
+      ]
+    });
+
+    return completion.choices[0]?.message?.content.trim() || 'No lesson plan available at the moment for the provided details.';
+  } catch (error) {
+    console.error('Error fetching lesson plan from OpenAI:', error);
+    throw new Error('Failed to retrieve lesson plan from OpenAI.');
+  }
+};
+
+// Handle the chat request (unifies both initial and further requests)
+const handleChatRequest = async (req, res) => {
+  try {
+    const { message, role, userId } = req.body;
+
+    // Log the incoming request payload for debugging
+    console.log('Received Request with Payload:', req.body);
+
+    // Validate that role and userId are provided
+    if (!role || !userId) {
+      return res.status(400).json({ error: 'Missing required parameters: role or userId.' });
+    }
+
+    let userDetails;
+    
+    // If no message is sent, return the initial system message (syllabus/lesson plan)
+    if (!message || message.trim() === '') {
+      console.log(`Fetching initial message for ${role} with userId: ${userId}`);
+
+      if (role === 'student') {
+        userDetails = await Student.findById(userId);
+        if (!userDetails) {
+          return res.status(404).json({ error: 'Student details not found.' });
+        }
+
+        const syllabus = await getSyllabusForStudent(userDetails.classStandard, userDetails.board, userDetails.stream);
+        return res.status(200).json({
+          reply: `Here is the syllabus for Class ${userDetails.classStandard}, Stream: ${userDetails.stream}, (${userDetails.board} board):\n${syllabus}`
+        });
+      } else if (role === 'teacher') {
+        userDetails = await Teacher.findById(userId);
+        if (!userDetails) {
+          return res.status(404).json({ error: 'Teacher details not found.' });
+        }
+
+        const lessonPlan = await getLessonPlanForTeacher(userDetails.subject, userDetails.grade_levels);
+        return res.status(200).json({
+          reply: `Here is the lesson plan for ${userDetails.subject} (Grades ${userDetails.grade_levels}): \n${lessonPlan}`
+        });
+      } else {
+        return res.status(400).json({ error: 'Invalid role provided. Must be either "student" or "teacher".' });
+      }
+    }
+
+    // **For further requests (user input messages)**
+    console.log(`Processing further message: ${message}`);
+
+    // Prompt OpenAI with the user's message to get a response
+    const openaiResponse = await openai.chat.completions.create({
+      model: 'gpt-4',
+      messages: [
+        { role: 'system', content: 'You are an educational assistant.' },
+        { role: 'user', content: `${message}` }
+      ]
+    });
+
+    // Extract and return the response generated by OpenAI
+    const replyFromOpenAI = openaiResponse.choices[0]?.message?.content.trim() || 'Unable to generate a valid response. Please try again.';
+
+    // Send the response back to the frontend
+    return res.status(200).json({
+      reply: replyFromOpenAI
+    });
+
+  } catch (error) {
+    console.error('Error processing chat request:', error);
+    return res.status(500).json({ error: 'Server encountered an error while processing your request.' });
+  }
+};
+
+// Export the unified function for use in routes
+module.exports = { handleChatRequest };

@@ -6,7 +6,12 @@ const teacherSchema = new mongoose.Schema({
   subject: { type: String, required: true },
   grade_levels: { type: String, required: true },
   email: { type: String, required: true, unique: true },
-  mobile: { type: String, required: true }
+  mobile: { type: String, required: true },
+  username: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+
+  // Add a reference to the chat history
+  history: [{ type: mongoose.Schema.Types.ObjectId, ref: 'ChatHistory' }]  
 }, {
   timestamps: true
 });

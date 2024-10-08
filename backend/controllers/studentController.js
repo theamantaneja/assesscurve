@@ -1,9 +1,13 @@
 const Student = require('../models/Student');
+const bcrypt = require('bcryptjs');
 
+// Function to create a new student
 const createStudent = async (req, res) => {
   try {
-    console.log('Received student data:', req.body);
-    const { name, age, class: classStandard, school, board, email, mobile } = req.body;
+    const { name, age, class: classStandard, school, board, email, mobile, username, password } = req.body;
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const student = new Student({
       name,
@@ -12,19 +16,20 @@ const createStudent = async (req, res) => {
       school,
       board,
       email,
-      mobile
+      mobile,
+      username,
+      password: hashedPassword, // Save hashed password
     });
 
-    console.log('Student object created:', student);
-    const savedStudent = await student.save();
-    console.log('Student saved successfully:', savedStudent);
-    res.status(201).send(savedStudent);
+    await student.save();
+    res.status(201).send(student);
   } catch (error) {
     console.error('Error creating student:', error);
-    res.status(400).send(error.message);
+    res.status(400).send(error);
   }
 };
 
+// Get all students
 const getStudents = async (req, res) => {
   try {
     const students = await Student.find();
@@ -34,11 +39,12 @@ const getStudents = async (req, res) => {
   }
 };
 
+// Get student by ID
 const getStudentById = async (req, res) => {
   try {
     const student = await Student.findById(req.params.id);
     if (!student) {
-      return res.status(404).message('Student not found').send();
+      return res.status(404).send('Student not found');
     }
     res.status(200).send(student);
   } catch (error) {
@@ -46,13 +52,18 @@ const getStudentById = async (req, res) => {
   }
 };
 
+// Update student
 const updateStudent = async (req, res) => {
   try {
     const { name, age, class: classStandard, school, board, email, mobile } = req.body;
 
-    const student = await Student.findByIdAndUpdate(req.params.id, { name, age, class: classStandard, school, board, email, mobile }, { new: true, runValidators: true });
+    const student = await Student.findByIdAndUpdate(req.params.id, 
+      { name, age, class: classStandard, school, board, email, mobile }, 
+      { new: true, runValidators: true }
+    );
+
     if (!student) {
-      return res.status(404).message('Student not found').send();
+      return res.status(404).send('Student not found');
     }
     res.status(200).send(student);
   } catch (error) {
@@ -60,11 +71,12 @@ const updateStudent = async (req, res) => {
   }
 };
 
+// Delete student
 const deleteStudent = async (req, res) => {
   try {
     const student = await Student.findByIdAndDelete(req.params.id);
     if (!student) {
-      return res.status(404).message('Student not found').send();
+      return res.status(404).send('Student not found');
     }
     res.status(200).send(student);
   } catch (error) {

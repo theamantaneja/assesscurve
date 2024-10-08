@@ -1,14 +1,13 @@
 import React from 'react';
-import { createRoot } from 'react-dom/client';
-import './index.css'; // Ensure this path is correct and Tailwind is imported here
+import ReactDOM from 'react-dom/client';  // `createRoot` is imported from 'react-dom/client'
 import App from './App';
+import { UserProvider } from './context/UserContext.jsx';
 
-// Create the root element using React 18's createRoot API
-const container = document.getElementById('root');
-const root = createRoot(container);
+// Create root and render the app
+const root = ReactDOM.createRoot(document.getElementById('root'));  // Use createRoot in React 18
 
 root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
+  <UserProvider>   {/* Wrap your entire app with UserProvider for global context */}
+    <App />        {/* Render the app */}
+  </UserProvider>
 );

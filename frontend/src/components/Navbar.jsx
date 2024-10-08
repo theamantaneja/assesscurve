@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useContext } from "react";
 import styled from "styled-components";
-import axios from 'axios';
+import { UserContext } from '../context/UserContext';  // Import UserContext for login state
 
+// Styled Components
 const Section = styled.div`
   display: flex;
   justify-content: center;
@@ -70,40 +71,12 @@ const Button = styled.button`
 `;
 
 const Navbar = () => {
-  const [number, setNumber] = useState('');
+  const { isLoggedIn, logout } = useContext(UserContext);  // Grab login state and logout function
 
-  const sendMsg = () => {
-    console.log("Number is", number);
-
-    const body = {
-      "messaging_product": "whatsapp",
-      "to": "918586842783",
-      "type": "template",
-      "template": {
-        "name": "hello_world",
-        "language": {
-          "code": "en_US"
-        }
-      }
-    };
-
-    axios.post(
-      'https://graph.facebook.com/v20.0/467155953139597/messages',
-      body,
-      {
-        headers: {
-          Authorization: `Bearer EAAHSx0xfTOgBOw6dan0ZBXBz67864vMJeBTE0hZCrBlBMUrvT8D8jBldZAHJfDkdCZAKi1RqhKEhrkl80AS1f2sdmVoh29z1OdPa01092K880UGy0VslE4SG1rQQSOdzLopeyTbqHenZCksOEydmRyJ6JwqWvy2yWgbJnDYVsNurDBiQJ3NuMIfXb3wNm3xBQmvrOrap06TSbETUrILG3OVyB5B7ty9FzQvcZD`,
-          'Content-Type': 'application/json',
-          Accept: 'application/json'
-        }
-      }
-    )
-    .then((res) => {
-      console.log("Msg Send Success", res);
-    })
-    .catch((err) => {
-      console.error("Error while sending", err.response ? err.response.data : err.message);
-    });
+  // Handle user logout
+  const handleLogout = () => {
+    logout();  // Call logout function to clear session and terminate backend session
+      // Redirect to home after logout
   };
 
   return (
@@ -118,9 +91,16 @@ const Navbar = () => {
             <ListItem>Contact</ListItem>
           </List>
         </Links>
+
         <Icons>
           <Icon src="./img/search.png" />
-          <Button onClick={sendMsg}>Send WhatsApp Msg</Button>
+          
+          {/* Conditionally show logout button if the user is logged in */}
+          {isLoggedIn ? (
+            <Button onClick={handleLogout}>Logout</Button>
+          ) : (
+            <Button>Sign In</Button>  // Can be replaced with a login route
+          )}
         </Icons>
       </Container>
     </Section>
