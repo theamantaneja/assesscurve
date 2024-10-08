@@ -325,7 +325,7 @@ const SignUpForm = ({ onSwitchToLogin, onClose }) => {
 
           <Button type="submit">Sign Up</Button>
         </form>
-        <SwitchToLogIn>Already have an account? <a onClick={onSwitchToSignUp}>Log in</a></SwitchToLogIn>
+        <SwitchToLogIn>Already have an account? <a onClick={onSwitchToLogin}>Log in</a></SwitchToLogIn>
       </FormContainer>
     </Modal>
   );
