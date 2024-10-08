@@ -33,7 +33,7 @@ const Section = styled.div`
 `;
 
 function Home() {
-  const [showLogin, setShowLogin] = useState(false);  // Hide login form by default
+  const [showLogin, setShowLogin] = useState(false);  // Hide login by default
   const [showSignUp, setShowSignUp] = useState(false);
   
   useEffect(() => {
@@ -48,37 +48,37 @@ function Home() {
     setShowSignUp(false);
   }, []);
 
-  // Open Login modal
+  // Open the Login modal
   const handleOpenLogin = useCallback(() => {
     console.log('Opening login modal');
     setShowLogin(true);
-    setShowSignUp(false);  // Ensure SignUp is hidden
+    setShowSignUp(false);  // Ensure sign up is hidden
   }, []);
 
-  // Open Sign-Up modal
+  // Open the Sign-Up modal
   const handleOpenSignUp = useCallback(() => {
     console.log('Opening sign-up modal');
     setShowSignUp(true);
-    setShowLogin(false);  // Ensure Login is hidden
+    setShowLogin(false);  // Ensure login is hidden
   }, []);
 
   return (
     <Container>
-      {/* Conditionally render the LoginForm and SignUpForm based on state */}
+      {/* Condition for showing the Login or SignUp */}
       {showLogin && <LoginForm onClose={handleCloseModal} onSwitchToSignUp={handleOpenSignUp} />}
-      {showSignUp && <SignUpForm onClose={handleCloseModal} />}
+      {showSignUp && <SignUpForm onClose={handleCloseModal} onSwitchToLogin={handleOpenLogin} />}
 
-      {/* Website sections */}
+      {/* Website sections*/}
       <Section><Hero /></Section>
       <Section><Who /></Section>
       <Section><Works /></Section>
       <Section><Contact /></Section>
 
-      {/* RoleSelection component controlling modal state */}
+      {/* RoleSelection component controls the modal state */}
       <Section>
         <RoleSelection
-          onLoginClick={handleOpenLogin}   // Trigger login modal open
-          onSignUpClick={handleOpenSignUp} // Trigger sign-up modal open
+          onLoginClick={handleOpenLogin}   // Open login modal
+          onSignUpClick={handleOpenSignUp} // Open sign-up modal
         />
       </Section>
     </Container>
