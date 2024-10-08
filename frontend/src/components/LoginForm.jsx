@@ -160,11 +160,6 @@ const LoginForm = ({ onClose, onSwitchToSignUp }) => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          {/* Role dropdown */}
-          <select value={role} onChange={(e) => setRole(e.target.value)} required>
-            <option value="student">Student</option>
-            <option value="teacher">Teacher</option>
-          </select>
           <Button type="submit">Login</Button>
         </form>
 

@@ -33,53 +33,53 @@ const Section = styled.div`
 `;
 
 function Home() {
-  const [showLogin, setShowLogin] = useState(false);  // Set login window to hidden by default
+  const [showLogin, setShowLogin] = useState(false);  // Assume hidden by default
   const [showSignUp, setShowSignUp] = useState(false);
   
-  // Logging whenever modal visibility changes for debugging purpose
+  // Perform logging for debugging purposes
   useEffect(() => {
-    console.log('showLogin:', showLogin);
-    console.log('showSignUp:', showSignUp);
+    console.log('Login Modal State:', showLogin);
+    console.log('SignUp Modal State:', showSignUp);
   }, [showLogin, showSignUp]);
 
-  // Function to close both modals
+  // Close both modals
   const handleCloseModal = useCallback(() => {
-    console.log('Closing any open modal');
+    console.log('Closing all modals');
     setShowLogin(false);
     setShowSignUp(false);
   }, []);
 
-  // Function to open the login modal
+  // Open Login modal
   const handleOpenLogin = useCallback(() => {
     console.log('Opening login modal');
     setShowLogin(true);
-    setShowSignUp(false);
+    setShowSignUp(false);  // Hide Sign-Up modal
   }, []);
 
-  // Function to open the sign-up modal
+  // Open Sign-Up modal
   const handleOpenSignUp = useCallback(() => {
     console.log('Opening sign-up modal');
     setShowSignUp(true);
-    setShowLogin(false);
+    setShowLogin(false);  // Hide Login modal
   }, []);
 
   return (
     <Container>
-      {/* Conditionally render Login or SignUp modals when the respective state is true */}
-      {showLogin && <LoginForm onClose={handleCloseModal} />}
+      {/* Conditionally render the LoginForm and SignUpForm based on modal state */}
+      {showLogin && <LoginForm onClose={handleCloseModal} onSwitchToSignUp={handleOpenSignUp} />}
       {showSignUp && <SignUpForm onClose={handleCloseModal} />}
 
-      {/* Main website sections */}
+      {/* Website Sections */}
       <Section><Hero /></Section>
       <Section><Who /></Section>
       <Section><Works /></Section>
       <Section><Contact /></Section>
 
-      {/* Pass modal open handlers to RoleSelection */}
+      {/* RoleSelection component controlling modal state */}
       <Section>
         <RoleSelection
-          onLoginClick={handleOpenLogin}   // Pass login click handler
-          onSignUpClick={handleOpenSignUp}  // Pass sign-up click handler
+          onLoginClick={handleOpenLogin}   // For opening login modal
+          onSignUpClick={handleOpenSignUp} // For opening sign-up modal
         />
       </Section>
     </Container>
