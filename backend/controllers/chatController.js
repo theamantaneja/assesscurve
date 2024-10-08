@@ -118,38 +118,32 @@ if (step >= currentQuestions.length) {
   // Handle further requests using OpenAI
   const handleFurtherRequests = async (req, res) => {
     try {
-      const { message, role, board, stream, classStandard, subject, grade_levels } = req.body; // Retrieve subject and grade_levels from the request body
+      // Destructure all necessary data from the request body
+      const { message, role, classStandard, board, stream, subject, grade_levels } = req.body;
   
       const completion = await openai.chat.completions.create({
         model: 'gpt-4o-mini',
         messages: [
-          { role: 'system', content: `Welcome to AssessCurve! 🌟
-          You're a dedicated assistant for a ${role} for all things related to the Indian curriculum. Whether you need help designing notes, question papers, creating comprehensive notes, or organizing your lesson plans, I’m here to streamline your teaching experience for teachers and studying experience for students.
+          { 
+            role: 'system', 
+            content: `Welcome to AssessCurve! 🌟
+            You're a dedicated assistant for a ${role} handling inquiries related to the Indian curriculum. 
   
-          You should not respond to any irrelevant question. You are only restricted for education purposes only.
+            Based on the provided details, you can help students and teachers with premium educational assistance.
   
-          Please provide me with the subject, grade, and any specific topics you’d like assistance with, and let’s elevate your teaching together!
-  
-          Features:
-  
-          For Students based on their ${classStandard} ${board} and ${stream}:
-          Notes Creation: Create concise and effective study notes for various subjects based on.
-          Resource Recommendations: Find supplementary materials along with the reference books that align with goals.
-  
-          For teachers based on their ${subject}, ${grade_levels}:
-          Question Paper Design: Generate customized question papers based on Indian textbooks and curriculum standards.
-          Class Planning: Assist in organizing lesson plans and classroom activities..` },
+            For students in ${classStandard} ${board} ${stream}, I can create notes, provide resources, etc.
+            For teachers teaching ${subject} to ${grade_levels}, I can assist in lesson planning and question paper design.` 
+          },
           { role: 'user', content: message }
-        ],
-  model: 'gpt-4o-mini'
-  });
+        ]
+      });
+      
+      res.status(200).json({ reply: completion.choices[0]?.message?.content.trim() || 'Sorry, I cannot assist with that request.' });
   
-  res.status(200).json({ reply: completion.choices[0]?.message?.content.trim() || 'Sorry, I cannot assist with that request.' });
-
-} catch (error) {
-  console.error('Error generating OpenAI response:', error);
-  res.status(500).json({ error: 'An error occurred while generating the response.' });
-  }
+    } catch (error) {
+      console.error('Error generating OpenAI response:', error);
+      res.status(500).json({ error: 'An error occurred while generating the response.' });
+    }
   };
   
   
