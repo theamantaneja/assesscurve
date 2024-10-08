@@ -33,7 +33,7 @@ const Section = styled.div`
 `;
 
 function Home() {
-  const [showLogin, setShowLogin] = useState(false);  // Hide login by default
+  const [showLogin, setShowLogin] = useState(false);  // Hide login form by default
   const [showSignUp, setShowSignUp] = useState(false);
   
   useEffect(() => {
@@ -48,37 +48,37 @@ function Home() {
     setShowSignUp(false);
   }, []);
 
-  // Open the Login modal
+  // Open Login modal
   const handleOpenLogin = useCallback(() => {
     console.log('Opening login modal');
     setShowLogin(true);
-    setShowSignUp(false);  // Ensure sign up is hidden
+    setShowSignUp(false);  // Ensure SignUp is hidden
   }, []);
 
-  // Open the Sign-Up modal
+  // Open Sign-Up modal
   const handleOpenSignUp = useCallback(() => {
     console.log('Opening sign-up modal');
     setShowSignUp(true);
-    setShowLogin(false);  // Ensure login is hidden
+    setShowLogin(false);  // Ensure Login is hidden
   }, []);
 
   return (
     <Container>
-      {/* Condition for showing the Login or SignUp */}
+      {/* Conditionally render the LoginForm and SignUpForm based on state */}
       {showLogin && <LoginForm onClose={handleCloseModal} onSwitchToSignUp={handleOpenSignUp} />}
-      {showSignUp && <SignUpForm onClose={handleCloseModal} onSwitchToLogin={handleOpenLogin} />}
+      {showSignUp && <SignUpForm onClose={handleCloseModal} />}
 
-      {/* Website sections*/}
+      {/* Website sections */}
       <Section><Hero /></Section>
       <Section><Who /></Section>
       <Section><Works /></Section>
       <Section><Contact /></Section>
 
-      {/* RoleSelection component controls the modal state */}
+      {/* RoleSelection component controlling modal state */}
       <Section>
         <RoleSelection
-          onLoginClick={handleOpenLogin}   // Open login modal
-          onSignUpClick={handleOpenSignUp} // Open sign-up modal
+          onLoginClick={handleOpenLogin}   // Trigger login modal open
+          onSignUpClick={handleOpenSignUp} // Trigger sign-up modal open
         />
       </Section>
     </Container>
