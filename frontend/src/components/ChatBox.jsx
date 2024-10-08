@@ -1,5 +1,3 @@
-// ChatBox.jsx
-
 import React, { useState, useEffect, useRef } from 'react';
 import axios from './axiosConfig.js';
 import ReactMarkdown from 'react-markdown';
@@ -8,7 +6,7 @@ import './style.css';
 const ChatBox = ({ role }) => {
   const [message, setMessage] = useState('');
   const [chatHistory, setChatHistory] = useState([]);
-  const [user, setUser] = useState({ role });
+  const [user, setUser] = useState({ role }); // Updated to only hold role
   const [currentStep, setCurrentStep] = useState(0);
   const [isCollectionComplete, setIsCollectionComplete] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -33,15 +31,15 @@ const ChatBox = ({ role }) => {
     try {
       let response;
       if (isCollectionComplete) {
-        response = await axios.post('/api/chat/furtherRequest', { message, role });
+        response = await axios.post('/api/chat/furtherRequest', { message, role, ...user });
         setChatHistory((prevHistory) => [
           ...prevHistory,
           { type: 'bot', text: response.data.reply }
         ]);
       } else {
         const questionField = role === 'student'
-          ? ['name', 'age', 'class', 'stream', 'school', 'board', 'email', 'mobile'][currentStep - 1]
-          : ['name', 'age', 'subject', 'grade_levels', 'email', 'mobile'][currentStep - 1];
+          ? ['class', 'stream', 'board'][currentStep - 1] // Modified
+          : ['subject', 'grade_levels'][currentStep - 1]; // Updated if needed
 
         const updatedUser = { ...user, [questionField]: message };
         response = await axios.post('/api/chat/saveResponse', { user: updatedUser, role, step: currentStep });
