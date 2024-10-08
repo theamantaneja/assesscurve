@@ -33,10 +33,9 @@ const Section = styled.div`
 `;
 
 function Home() {
-  const [showLogin, setShowLogin] = useState(false);  // Assume hidden by default
+  const [showLogin, setShowLogin] = useState(false);  // Hide login form by default
   const [showSignUp, setShowSignUp] = useState(false);
   
-  // Perform logging for debugging purposes
   useEffect(() => {
     console.log('Login Modal State:', showLogin);
     console.log('SignUp Modal State:', showSignUp);
@@ -53,23 +52,23 @@ function Home() {
   const handleOpenLogin = useCallback(() => {
     console.log('Opening login modal');
     setShowLogin(true);
-    setShowSignUp(false);  // Hide Sign-Up modal
+    setShowSignUp(false);  // Ensure SignUp is hidden
   }, []);
 
   // Open Sign-Up modal
   const handleOpenSignUp = useCallback(() => {
     console.log('Opening sign-up modal');
     setShowSignUp(true);
-    setShowLogin(false);  // Hide Login modal
+    setShowLogin(false);  // Ensure Login is hidden
   }, []);
 
   return (
     <Container>
-      {/* Conditionally render the LoginForm and SignUpForm based on modal state */}
+      {/* Conditionally render the LoginForm and SignUpForm based on state */}
       {showLogin && <LoginForm onClose={handleCloseModal} onSwitchToSignUp={handleOpenSignUp} />}
       {showSignUp && <SignUpForm onClose={handleCloseModal} />}
 
-      {/* Website Sections */}
+      {/* Website sections */}
       <Section><Hero /></Section>
       <Section><Who /></Section>
       <Section><Works /></Section>
@@ -78,8 +77,8 @@ function Home() {
       {/* RoleSelection component controlling modal state */}
       <Section>
         <RoleSelection
-          onLoginClick={handleOpenLogin}   // For opening login modal
-          onSignUpClick={handleOpenSignUp} // For opening sign-up modal
+          onLoginClick={handleOpenLogin}   // Trigger login modal open
+          onSignUpClick={handleOpenSignUp} // Trigger sign-up modal open
         />
       </Section>
     </Container>

@@ -20,13 +20,14 @@ const FormContainer = styled.div`
   background: #282c34;
   padding: 30px;
   border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
   width: 400px;
+  max-width: 90%;
 `;
 
 const CloseButton = styled.span`
   position: absolute;
-  top: 10px;
+  top: 15px;
   right: 15px;
   font-size: 24px;
   color: white;
@@ -37,8 +38,14 @@ const CloseButton = styled.span`
   }
 `;
 
+const Heading = styled.h2`
+  color: #da4ea2;
+  margin-bottom: 30px;
+  text-align: center;
+`;
+
 const Input = styled.input`
-  margin-bottom: 15px;
+  margin-bottom: 20px;
   padding: 12px;
   width: 100%;
   border: 1px solid #da4ea2;
@@ -58,10 +65,11 @@ const Button = styled.button`
   font-weight: 500;
   width: 100%;
   padding: 12px;
+  margin-top: 10px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: background-color 0.3s ease;
 
   &:hover {
     background-color: #b83c8f;
@@ -70,7 +78,7 @@ const Button = styled.button`
 
 const SwitchToSignUp = styled.p`
   color: white;
-  margin-top: 10px;
+  margin-top: 15px;
   text-align: center;
   font-size: 14px;
   
@@ -78,6 +86,7 @@ const SwitchToSignUp = styled.p`
     color: #da4ea2;
     cursor: pointer;
     font-weight: bold;
+    text-decoration: none;
 
     &:hover {
       color: #b83c8f;
@@ -88,7 +97,7 @@ const SwitchToSignUp = styled.p`
 const LoginForm = ({ onClose, onSwitchToSignUp }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('student');  // Assume a default role, can be 'student' or 'teacher'
+  const [role, setRole] = useState('student');  // Default role is student
 
   const { login } = useContext(UserContext);  // Get login function from UserContext
 
@@ -114,18 +123,12 @@ const LoginForm = ({ onClose, onSwitchToSignUp }) => {
   
       if (response.ok) {
         console.log('Login successful, token generated:', data.token);
-
-        // Log the full data received from backend
         console.log('User data received:', data.user);
-
-        // Call the login function to store data in UserContext and localStorage
         login(data.token, data.user.role, data.user.id);
-
-        // Close the modal 
-        onClose();
+        onClose();  // Close the modal after successful login
       } else {
         console.error('Error during login:', data.error);
-        alert(data.error);  // Display error if login fails
+        alert(data.error);  // Show error message
       }
     } catch (error) {
       console.error('Error occurred during login:', error);
@@ -133,10 +136,10 @@ const LoginForm = ({ onClose, onSwitchToSignUp }) => {
     }
   };
 
-  // Handle closing the modal when clicking outside the form
+  // Handle closing the modal on outside click
   const handleClickOutside = (e) => {
     if (e.target.id === 'modal') {
-      onClose(); // Close modal on outside click
+      onClose();  // Close modal on outside click
     }
   };
 
@@ -144,7 +147,7 @@ const LoginForm = ({ onClose, onSwitchToSignUp }) => {
     <Modal id="modal" onClick={handleClickOutside}>
       <FormContainer>
         <CloseButton onClick={onClose}>&times;</CloseButton> {/* Close Button */}
-        <h2 style={{ color: '#da4ea2' }}>Login</h2>
+        <Heading>Login</Heading>
         <form onSubmit={handleLoginSubmit}>
           <Input
             type="text"
@@ -163,7 +166,7 @@ const LoginForm = ({ onClose, onSwitchToSignUp }) => {
           <Button type="submit">Login</Button>
         </form>
 
-        {/* "Don't have an account? Sign up" section */}
+        {/* "Don't have an account? Sign up" section for switching */}
         <SwitchToSignUp>
           Don't have an account? <a onClick={onSwitchToSignUp}>Sign Up</a>
         </SwitchToSignUp>
