@@ -102,11 +102,22 @@ const Button = styled.button`
   }
 `;
 
-const ToggleLink = styled.p`
-  color: lightgray;
+const SwitchToLogIn = styled.p`
+  color: white;
+  margin-top: 15px;
   text-align: center;
-  margin-top: 10px;
-  cursor: pointer;
+  font-size: 14px;
+  
+  a {
+    color: #da4ea2;
+    cursor: pointer;
+    font-weight: bold;
+    text-decoration: none;
+
+    &:hover {
+      color: #b83c8f;
+    }
+  }
 `;
 
 const SignUpForm = ({ onSwitchToLogin, onClose }) => {
@@ -314,7 +325,7 @@ const SignUpForm = ({ onSwitchToLogin, onClose }) => {
 
           <Button type="submit">Sign Up</Button>
         </form>
-        <ToggleLink onClick={onSwitchToLogin}>Already have an account? Login</ToggleLink>
+        <SwitchToLogIn>Already have an account? <a onClick={onSwitchToSignUp}>Log in</a></SwitchToLogIn>
       </FormContainer>
     </Modal>
   );
