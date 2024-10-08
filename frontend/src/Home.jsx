@@ -7,7 +7,7 @@ import Contact from './components/Contact';
 import LoginForm from './components/LoginForm';
 import SignUpForm from './components/SignUpForm';
 import RoleSelection from './components/RoleSelection';
-import { UserContext } from '../context/UserContext';  // Import the UserContext to access logged-in state
+import { UserContext } from './context/UserContext';  // Import the UserContext to access logged-in state
 
 const Container = styled.div`
   height: 100vh;
