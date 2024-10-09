@@ -2,6 +2,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Student = require('../models/Student');
 const Teacher = require('../models/Teacher');
+const config = require('../config/config');
 
 // Register a new user (Student / Teacher)
 const registerUser = async (req, res) => {
@@ -12,44 +13,51 @@ const registerUser = async (req, res) => {
       name,
       email,
       age,
-      classStandard, // Students only
+      classStandard,  // Students only
       stream,
       school,
       board,
-      subject,       // Teachers only
-      grade_levels,  // Teachers only
+      subject,        // Teachers only
+      grade_levels,   // Teachers only
       mobile,
       role
     } = req.body;
 
-    // Log incoming request body for debugging
+    // Log incoming registration data for debugging purposes
     console.log('Received registration data:', req.body);
 
     // Validate role: must be 'student' or 'teacher'
     if (!role || (role !== 'student' && role !== 'teacher')) {
+      console.error('Invalid role provided:', role);
       return res.status(400).json({ error: 'Invalid role provided!' });
     }
-
-    // Additional validation for students
+    
+    // Check for required fields for students
     if (role === 'student' && (!classStandard || !school || !board)) {
-      console.error({ error: 'Missing required fields for student' });
+      console.error('Missing required fields for student:', req.body);
       return res.status(400).json({ error: 'Missing required fields for student!' });
     }
 
-    // Additional validation for teachers
+    // Check for required fields for teachers
     if (role === 'teacher' && (!subject || !grade_levels)) {
-      console.error({ error: 'Missing required fields for teacher' });
+      console.error('Missing required fields for teacher:', req.body);
       return res.status(400).json({ error: 'Missing required fields for teacher!' });
     }
 
-    // Check if email or username is already used
-    const existingEmail = await Student.findOne({ email }) || await Teacher.findOne({ email });
-    if (existingEmail) return res.status(409).json({ error: 'Email already registered!' });
+    // Check if email or username already exists in either collections (Student, Teacher)
+    const emailExists = await Student.findOne({ email }) || await Teacher.findOne({ email });
+    if (emailExists) {
+      console.error('Email already exists:', email);
+      return res.status(409).json({ error: 'Email already registered!' });
+    }
 
-    const existingUsername = await Student.findOne({ username }) || await Teacher.findOne({ username });
-    if (existingUsername) return res.status(409).json({ error: 'Username already exists!' });
+    const usernameExists = await Student.findOne({ username }) || await Teacher.findOne({ username });
+    if (usernameExists) {
+      console.error('Username already exists:', username);
+      return res.status(409).json({ error: 'Username already exists!' });
+    }
 
-    // Hash the password before saving the user
+    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
     if (role === 'student') {
@@ -66,10 +74,11 @@ const registerUser = async (req, res) => {
         board,
         mobile,
       });
-      await newStudent.save();  // Save the student to the database
+      await newStudent.save();  // Save the student in the database
+
       return res.status(201).json({ message: 'Student registered successfully!', user: newStudent });
-      
-    } else if (role === 'teacher') {
+    } 
+    else if (role === 'teacher') {
       // Create a new teacher
       const newTeacher = new Teacher({
         username,
@@ -79,102 +88,100 @@ const registerUser = async (req, res) => {
         age,
         subject,
         grade_levels,
-        mobile,
+        mobile
       });
-      await newTeacher.save();  // Save the teacher to the database
+      await newTeacher.save();  // Save the teacher in the database
+
       return res.status(201).json({ message: 'Teacher registered successfully!', user: newTeacher });
     }
 
   } catch (error) {
-    // Log the actual server error that caused the exception
-    console.error('Error during registration: ', error);
-
-    // Send back the error message as a 500 Internal Server Error
-    return res.status(500).json({ error: 'Failed to register user due to internal server error.' });
+    console.error('Error during registration:', error);  // Log the actual server error
+    return res.status(500).json({ error: 'Registration failed due to server error.' });
   }
 };
 
+// Login user (Student / Teacher)
 const loginUser = async (req, res) => {
   try {
     const { username, password, role } = req.body;
 
-    // Ensure username, password, and role are present in req.body
+    // Validate input
     if (!username || !password || !role) {
+      console.error('Missing required fields for login:', req.body);
       return res.status(400).json({ error: 'Please provide username, password, and role.' });
     }
 
-    // Ensure role is valid (either 'student' or 'teacher')
+    // Role validation check
     if (role !== 'student' && role !== 'teacher') {
+      console.error('Invalid role during login:', role);
       return res.status(400).json({ error: 'Invalid role. Must be either "student" or "teacher".' });
     }
 
-    // Fetch the user based on the provided role (Student or Teacher)
     let user;
+    // Fetch user based on role
     if (role === 'student') {
       user = await Student.findOne({ username });
     } else if (role === 'teacher') {
       user = await Teacher.findOne({ username });
-    }
+    } 
 
-    // If user is not found in the database
+    // If user is not found
     if (!user) {
+      console.error('User not found for username:', username);
       return res.status(404).json({ error: 'User not found!' });
     }
 
-    // Compare provided password with the stored hashed password
-    const isValidPassword = await bcrypt.compare(password, user.password);
-    if (!isValidPassword) {
+    // Compare the entered password with the stored hashed password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      console.error('Invalid credentials provided for username:', username);
       return res.status(400).json({ error: 'Invalid credentials! Check your username or password.' });
     }
 
-    // Generate a JWT token with user ID and role, valid for 1 hour
+    // Generate a JWT for the authenticated user
     const token = jwt.sign(
-      { id: user._id, role },
-      process.env.JWT_SECRET,
+      { id: user._id, role }, 
+      process.env.JWT_SECRET, 
       { expiresIn: '1h' }
     );
 
-    // **Important**: Retrieve additional user details to send back in the response
-    const userData = {
-      id: user._id,
-      username: user.username,
-      email: user.email,  // Assuming there's an email field
-      role,
-      // Add any other necessary fields here
-    };
-
-    // Send back the token and complete user details
+    // Send back token and user information
     res.status(200).json({
       token,
-      user: userData
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        role
+      }
     });
-    
+
   } catch (error) {
-    console.error('Error during login:', error);
-    return res.status(500).json({ error: 'Failed to login due to server error.' });
+    console.error('Error during login:', error);  // Log actual server error
+    return res.status(500).json({ error: 'Failed to log in due to server error.' });
   }
 };
 
-// authController.js (Backend)
-
+// Logout user (Session based logout)
 const logoutUser = (req, res) => {
   try {
-    // If using session authentication, destroy the session on logout
+    // Destroy session if it's available
     if (req.session) {
       req.session.destroy(err => {
         if (err) {
           console.error('Failed to destroy session:', err);
-          return res.status(500).json({ message: 'Failed to log out. Please try again later.' });
+          return res.status(500).json({ message: 'Failed to log out, please try again later.' });
         }
-        res.clearCookie('connect.sid');  // Clear the session cookie
+        res.clearCookie('connect.sid');  // Clear session cookie
         return res.status(200).json({ message: 'Logged out successfully.' });
       });
     } else {
-      return res.status(200).json({ message: 'No session found to log out, but assuming user is logged out.' });
+      return res.status(200).json({ message: 'No active session found, considered logged out.' });
     }
   } catch (error) {
-    console.error('Error logging out:', error);
-    return res.status(500).json({ message: 'Failed to log out. Please try again later.' });
+    console.error('Error during logout:', error);  // Actual error logging
+    return res.status(500).json({ message: 'Failed to log out due to server error.' });
   }
 };
 
