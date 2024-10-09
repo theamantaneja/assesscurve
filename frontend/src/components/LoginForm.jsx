@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import styled from 'styled-components';
-import { UserContext } from '../context/UserContext';  // Using UserContext
+import { UserContext } from '../context/UserContext';  // Access login data from UserContext
 
 const Modal = styled.div`
   position: fixed;
@@ -61,6 +61,21 @@ const Input = styled.input`
   }
 `;
 
+const Select = styled.select`
+  padding: 12px;
+  width: 100%;
+  background: #3d1c56;
+  border: 1px solid #da4ea2;
+  color: white;
+  border-radius: 5px;
+  margin-bottom: 15px;
+
+  &:focus {
+    outline: none;
+    border-color: #da4ea2;
+  }
+`;
+
 const Button = styled.button`
   background-color: #da4ea2;
   color: white;
@@ -99,38 +114,41 @@ const SwitchToSignUp = styled.p`
 const LoginForm = ({ onClose, onSwitchToSignUp }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('student');  // Default role is student
+  const [role, setRole] = useState('student'); // Default to "student", provide option for teacher
 
-  const { login } = useContext(UserContext);  // Get login function from UserContext
+  const { login } = useContext(UserContext);  // Access login function from UserContext
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
-  
+
     const loginData = {
       username,
       password,
       role
     };
-  
+
+    console.log('Sending Login Data:', loginData);  // For frontend debugging
+
     try {
       const response = await fetch('https://assesscurve.onrender.com/api/auth/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(loginData),
       });
-  
+
       const data = await response.json();
-  
+
       if (response.ok) {
         console.log('Login successful, token generated:', data.token);
         console.log('User data received:', data.user);
-        login(data.token, data.user.role, data.user.id);  // Store login data in UserContext
+
+        // Store login data in UserContext
+        login(data.token, data.user.role, data.user.id);  
+
         onClose();  // Close the modal after successful login
       } else {
-        console.error('Error during login:', data.error);
-        alert(data.error);  // Show error message if login fails
+        console.error('Login error:', data.error);
+        alert(data.error);  // Display error if login fails
       }
     } catch (error) {
       console.error('Error occurred during login:', error);
@@ -141,7 +159,7 @@ const LoginForm = ({ onClose, onSwitchToSignUp }) => {
   // Handle closing the modal on outside click
   const handleClickOutside = (e) => {
     if (e.target.id === 'modal') {
-      onClose();  // Close modal on outside click
+      onClose();  // Close the modal when clicking outside
     }
   };
 
@@ -149,7 +167,8 @@ const LoginForm = ({ onClose, onSwitchToSignUp }) => {
     <Modal id="modal" onClick={handleClickOutside}>
       <FormContainer>
         <CloseButton onClick={onClose}>&times;</CloseButton> {/* Close Button */}
-        <Heading>Login</Heading>
+        <Heading>Log In</Heading>
+
         <form onSubmit={handleLoginSubmit}>
           <Input
             type="text"
@@ -165,10 +184,21 @@ const LoginForm = ({ onClose, onSwitchToSignUp }) => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
+
+          {/* Dropdown for choosing role (student or teacher) */}
+          <Select 
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            required
+          >
+            <option value="student">Student</option>
+            <option value="teacher">Teacher</option>
+          </Select>
+
           <Button type="submit">Login</Button>
         </form>
 
-        {/* "Don't have an account? Sign up" section for switching */}
+        {/* Allow user to switch to sign-up */}
         <SwitchToSignUp>
           Don't have an account? <a onClick={onSwitchToSignUp}>Sign Up</a>
         </SwitchToSignUp>
