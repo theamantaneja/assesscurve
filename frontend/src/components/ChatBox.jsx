@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useRef } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import axios from './axiosConfig';
 import ReactMarkdown from 'react-markdown';
 import './style.css';
@@ -20,10 +20,7 @@ const ChatBox = () => {
     }
   }, [chatHistory]);
 
-  // Log role, isLoggedIn, and userId to ensure they are working correctly
   useEffect(() => {
-    console.log(`isLoggedIn: ${isLoggedIn}, role: ${role}, userId: ${userId}`);  // <-- Add this log
-  
     const loadInitialMessage = async () => {
       if (!role || !userId) {
         console.error('Missing role or userId; unable to start chat session.');
@@ -94,10 +91,10 @@ const ChatBox = () => {
 
       {/* Conditionally render the PdfUpload tool for teachers */}
       {role === 'teacher' && (
-        <div>
-          {/* Show the button to toggle the PDF Evaluation Tool */}
+        <div className="my-4">
+          {/* Tailwind-enhanced button */}
           <button
-            className="eval-tool-btn"
+            className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-300 transition duration-300 ease-in-out"
             onClick={() => setShowPdfUpload(!showPdfUpload)}
           >
             {showPdfUpload ? 'Hide' : 'Open'} AssessCurve Evaluation Tool
