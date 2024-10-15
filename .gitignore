@@ -1,0 +1,3 @@
+# .gitignore
+.env
+# Ignore credentials folder
