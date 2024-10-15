@@ -83,7 +83,7 @@ const deleteTeacher = async (req, res) => {
   }
 };
 
-const { runVertexAIPdfEvaluation } = require('../vertexAiService'); // Import the new Vertex AI service for PDFs
+const { runVertexAIPdfEvaluation } = require('../services/vertexAiService'); // Import the new Vertex AI service for PDFs
 
 // Handle the evaluation of a PDF containing question/answer content
 const evaluatePdf = async (req, res) => {
