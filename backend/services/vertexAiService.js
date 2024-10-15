@@ -1,6 +1,3 @@
-const process = require('process'); // For getting environment vars
-
-// Service to run a Python script for evaluating a PDF using Vertex AI
 const { spawn } = require('child_process');
 const path = require('path');
 
@@ -26,7 +23,7 @@ const runVertexAIPdfEvaluation = (pdfFilePath) => {
     pythonProcess.on('close', (code) => {
       if (code === 0) {
         try {
-          // Parse the JSON output from the Python script
+          // Parse the output as JSON, otherwise it will throw an error
           const result = JSON.parse(output); 
           resolve(result);  // Resolve with the evaluation results
         } catch (error) {
@@ -38,7 +35,5 @@ const runVertexAIPdfEvaluation = (pdfFilePath) => {
     });
   });
 };
-
-module.exports = { runVertexAIPdfEvaluation };
 
 module.exports = { runVertexAIPdfEvaluation };
