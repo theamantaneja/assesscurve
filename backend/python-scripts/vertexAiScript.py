@@ -4,7 +4,7 @@ import vertexai
 from vertexai.generative_models import GenerativeModel, Part
 
 # Set up the Google Cloud credentials path
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "backend/credentials/assesscurve-6d6c42083e0c.json"
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/credentials/assesscurve-6d6c42083e0c.json"
 
 # Initialize the project ID and location
 PROJECT_ID = "assesscurve"

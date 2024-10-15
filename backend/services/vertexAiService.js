@@ -4,7 +4,7 @@ const path = require('path');
 // Service to run Python script for evaluating a PDF using Vertex AI
 const runVertexAIPdfEvaluation = (pdfFilePath) => {
   return new Promise((resolve, reject) => {
-    const pythonProcess = spawn('python3', ['backend/python-scripts/vertexAiScript.py', pdfFilePath]);
+    const pythonProcess = spawn('python3', ['/python-scripts/vertexAiScript.py', pdfFilePath]);
 
     let output = '';
 
