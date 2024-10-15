@@ -25,9 +25,9 @@ router.delete('/:id', deleteTeacher);
 
 // Route to evaluate the PDF (for teacher's assessment tool)
 // Handles two fields - questionPaper and answersPDF
-router.post('/evaluate-pdf', upload.fields([
-  { name: 'questionPaper', maxCount: 1 },  // Handle 'questionPaper' as a field (1 file max)
-  { name: 'answersPDF', maxCount: 1 }      // Handle 'answersPDF' as a field (1 file max)
-]), evaluatePdf);
+router.post('/evaluate', upload.fields([  // Use '/evaluate' instead of '/evaluate-pdf'
+    { name: 'questionPaper', maxCount: 1 },
+    { name: 'answersPDF', maxCount: 1 }
+  ]), evaluatePdf);
 
 module.exports = router;

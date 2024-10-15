@@ -14,26 +14,26 @@ const PdfUpload = () => {
   // Submission handler for both PDFs
   const handleSubmit = async () => {
     if (!questionPaper || !answersPDF) {
-      alert("Please upload both the question paper and answer sheet PDFs!");
+      alert("Please upload both PDFs!");
       return;
     }
-
+  
     const formData = new FormData();
     formData.append('questionPaper', questionPaper);
     formData.append('answersPDF', answersPDF);
-
+  
     try {
-      const response = await axios.post('/api/teacher/evaluate', formData, {
+      const response = await axios.post('/api/teacher/evaluate-pdf', formData, { // Adjusted to match backend route
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       });
-      setResult(response.data); // Assuming the server responds with the evaluation
+      setResult(response.data); // Assuming the server responds with the evaluated results
     } catch (error) {
       console.error("Error submitting the PDFs", error);
     }
   };
-
+  
   return (
     <div className="pdf-upload-container">
       <h2>Upload PDFs for Evaluating Answer Sheets</h2>
