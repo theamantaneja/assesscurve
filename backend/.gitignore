@@ -2,3 +2,5 @@
 /credentials/
 backend/credentials/assesscurve-6d6c42083e0c.json
 .env  # Ignore environment variable files as well (if applicable)
+node modules
+venv
