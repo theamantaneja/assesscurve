@@ -88,25 +88,30 @@ const { runVertexAIPdfEvaluation } = require('../services/vertexAiService'); // 
 // Handle the evaluation of a PDF containing question/answer content
 const evaluatePdf = async (req, res) => {
   try {
-    const { filePath } = req.body; // Get the PDF file path from the request body (after upload handling)
+    // Ensure the file has been uploaded with Multer's help
+    const questionPaper = req.files['questionPaper'] ? req.files['questionPaper'][0] : null;
+    const answersPDF = req.files['answersPDF'] ? req.files['answersPDF'][0] : null;
 
-    if (!filePath) {
-      return res.status(400).json({ error: 'PDF file path is required for evaluation.' });
+    // Ensure both PDFs are uploaded
+    if (!questionPaper || !answersPDF) {
+      return res.status(400).json({ error: 'Both question paper and answers PDF are required for evaluation.' });
     }
 
-    console.log(`Received request to evaluate PDF: ${filePath}`);
+    // Log the paths for debugging purposes (Multer stores files in the temp directory on the server)
+    console.log('Evaluating question paper path:', questionPaper.path);
+    console.log('Evaluating answers PDF path:', answersPDF.path);
 
-    // Send the PDF file path to the Vertex AI service for evaluation
-    const vertexAIResponse = await runVertexAIPdfEvaluation(filePath);
+    // Call the Vertex AI evaluation service, passing the files' paths
+    const vertexAIResponse = await runVertexAIPdfEvaluation(questionPaper.path, answersPDF.path);
 
-    // Return the evaluation result from Vertex AI to the frontend
+    // Respond to the frontend with Vertex AI's evaluation result
     return res.status(200).json({
       reply: vertexAIResponse
     });
 
   } catch (error) {
     console.error('Error processing PDF evaluation request:', error);
-    return res.status(500).json({ error: 'An error occurred while evaluating the PDF.' });
+    return res.status(500).json({ error: 'An error occurred while evaluating the PDFs.' });
   }
 };
 

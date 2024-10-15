@@ -2,13 +2,15 @@ const cors = require('cors');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 
-// Configures CORS for the application
+// Configures CORS for the application with development and production checks
 const configureCors = () => {
-  return cors({
-    origin: process.env.CORS_ORIGIN || 'https://assesscurve.vercel.app', // Use either environment or default local
-    credentials: true, // Allow credentials like cookies, authorization headers, etc.
+  const corsOptions = {
+    origin: process.env.CORS_ORIGIN || ['http://localhost:3000', 'https://assesscurve.vercel.app'],  // Support localhost for development
+    credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  });
+  };
+
+  return cors(corsOptions);
 };
 
 // Configures session management with MongoDB store
@@ -18,14 +20,15 @@ const configureSession = (mongooseConnection) => {
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
-      mongoUrl: process.env.MONGO_URI || 'mongodb://localhost:27017/test', // Default local URI if not set
-      ttl: 14 * 24 * 60 * 60,  // Sessions expire in 14 days
-      collectionName: 'sessions', // Optional: customize collection name for sessions
+      mongoUrl: process.env.MONGO_URI || 'mongodb://localhost:27017/test', // Local if no MONGO_URI is given
+      ttl: 14 * 24 * 60 * 60,  // Set session expiration (14 days in this case)
+      collectionName: 'sessions', // Optional: customize collection name
     }),
     cookie: {
-      secure: process.env.NODE_ENV === 'production', // In production, cookies should only be sent over HTTPS
-      httpOnly: true,  // Prevent client-side JavaScript from accessing the cookie
-      maxAge: 1000 * 60 * 60 * 24 * 7,  // Cookie expires in 7 days
+      secure: process.env.NODE_ENV === 'production', // Only use HTTPS cookies in production
+      httpOnly: true,  // Prevent access to the cookie through JavaScript
+      maxAge: 1000 * 60 * 60 * 24 * 7,  // Set cookie to expire in 7 days
+      sameSite: 'strict',  // Additionally, protect against CSRF attacks
     }
   });
 };
