@@ -1,6 +1,6 @@
 import os
 import sys
-from google.cloud import aiplatform as vertexai
+import vertexai
 from vertexai.generative_models import GenerativeModel, Part
 
 # Set up the Google Cloud credentials path
