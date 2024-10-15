@@ -1,5 +1,3 @@
-const { spawn } = require('child_process');
-const path = require('path');
 const process = require('process'); // For getting environment vars
 
 // Service to run a Python script for evaluating a PDF using Vertex AI
