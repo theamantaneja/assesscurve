@@ -1,6 +1,5 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors');
 const dotenv = require('dotenv');
 const morgan = require('morgan');
 const { configureCors, configureSession } = require('./config/middleware');  // Import middleware functions
